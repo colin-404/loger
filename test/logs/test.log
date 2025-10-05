@@ -94,3 +94,12 @@
 {"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:37","msg":"info"}
 {"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:40","msg":"infof: error"}
 {"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:43","msg":"infomf","info":"test: error"}
+{"level":"info","timestamp":"2025-10-05T20:01:36+08:00","source":"test/loger_test.go:37","msg":"info"}
+{"level":"info","timestamp":"2025-10-05T20:01:36+08:00","source":"test/loger_test.go:40","msg":"infof: error"}
+{"level":"info","timestamp":"2025-10-05T20:01:36+08:00","source":"test/loger_test.go:43","msg":"infomf","info":"test: error"}
+{"level":"info","timestamp":"2025-10-05T20:02:02+08:00","source":"test/loger_test.go:37","msg":"info"}
+{"level":"info","timestamp":"2025-10-05T20:02:02+08:00","source":"test/loger_test.go:40","msg":"infof: error"}
+{"level":"info","timestamp":"2025-10-05T20:02:02+08:00","source":"test/loger_test.go:43","msg":"infomf","info":"test: error"}
+{"level":"info","timestamp":"2025-10-05T20:02:09+08:00","source":"test/loger_test.go:37","msg":"info"}
+{"level":"info","timestamp":"2025-10-05T20:02:09+08:00","source":"test/loger_test.go:40","msg":"infof: error"}
+{"level":"info","timestamp":"2025-10-05T20:02:09+08:00","source":"test/loger_test.go:43","msg":"infomf","info":"test: error"}

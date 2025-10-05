@@ -133,7 +133,7 @@ func NewLoger(opts *Options) *Loger {
 	}
 
 	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig),
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout),
+		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stderr),
 			zapcore.AddSync(hook)),
 		zapcore.Level(logLevel))
 

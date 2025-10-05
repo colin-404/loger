@@ -132,8 +132,12 @@ func NewLoger(opts *Options) *Loger {
 		encoderConfig.EncodeTime = zapcore.EpochTimeEncoder
 	}
 
+	std := os.Stderr
+	if opts.Stdout {
+		std = os.Stdout
+	}
 	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig),
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stderr),
+		zapcore.NewMultiWriteSyncer(zapcore.AddSync(std),
 			zapcore.AddSync(hook)),
 		zapcore.Level(logLevel))
 

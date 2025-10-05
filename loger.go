@@ -3,6 +3,9 @@ package logx
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -39,6 +42,13 @@ var TimeFormats = timeFormatContainer{
 
 var defaultLogger *Loger
 
+// init provides a usable default logger so callers can use logx without explicit initialization.
+func init() {
+	if defaultLogger == nil {
+		defaultLogger = NewLoger(&Options{})
+	}
+}
+
 func InitLogger(logger *Loger) {
 	defaultLogger = logger
 }
@@ -51,6 +61,9 @@ type Loger struct {
 }
 
 func NewLoger(opts *Options) *Loger {
+	if opts == nil {
+		opts = &Options{}
+	}
 
 	logFile := defaultLogFile
 	if opts.LogFile != "" {
@@ -65,7 +78,7 @@ func NewLoger(opts *Options) *Loger {
 		maxAge = opts.MaxAge
 	}
 	maxBackups := defaultMaxBackups
-	if opts.MaxSize != 0 {
+	if opts.MaxBackups != 0 {
 		maxBackups = opts.MaxBackups
 	}
 	logLevel := defaultLevel
@@ -151,10 +164,7 @@ func (l *Loger) Println(v ...interface{}) {
 }
 
 func Fatalf(msg string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(msg+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= FatalLevel {
 		// defaultLogger.provider.Fatal(msg, zap.String("info", fmt.Sprintf(format, v...)))
 		defaultLogger.provider.Fatal(fmt.Sprintf(msg, v...))
@@ -162,70 +172,46 @@ func Fatalf(msg string, v ...interface{}) {
 }
 
 func Fatalmf(msg string, format string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(format+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= FatalLevel {
 		defaultLogger.provider.Fatal(msg, zap.String("info", fmt.Sprintf(format, v...)))
 	}
 }
 
 func Errorf(msg string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(msg+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= ErrorLevel {
 		defaultLogger.provider.Error(fmt.Sprintf(msg, v...))
 	}
 }
 
 func Errormf(msg string, format string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(format+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= ErrorLevel {
 		defaultLogger.provider.Error(msg, zap.String("info", fmt.Sprintf(format, v...)))
 	}
 }
 
 func Warnf(msg string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(msg+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= WarnLevel {
 		defaultLogger.provider.Warn(fmt.Sprintf(msg, v...))
 	}
 }
 
 func Warnmf(msg string, format string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(format+"\n", v...)
-		return
-	}
 	if defaultLogger.lvl <= WarnLevel {
 		defaultLogger.provider.Warn(msg, zap.String("info", fmt.Sprintf(format, v...)))
 	}
 }
 
 func Info(v interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf("%v"+"\n", v)
-		return
-	}
 	if defaultLogger.lvl <= InfoLevel {
 		defaultLogger.provider.Info(fmt.Sprintf("%v", v))
 	}
 }
 
 func Infof(msg string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(msg+"\n", v...)
-		return
-	}
 	if defaultLogger.lvl <= InfoLevel {
 		defaultLogger.provider.Info(fmt.Sprintf(msg, v...))
 	}
@@ -233,10 +219,7 @@ func Infof(msg string, v ...interface{}) {
 
 // add msg to log
 func Infomf(msg string, format string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(format+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= InfoLevel {
 		defaultLogger.provider.Info(msg, zap.String("info", fmt.Sprintf(format, v...)))
 	}
@@ -253,21 +236,57 @@ func Debug(v interface{}) {
 }
 
 func Debugf(msg string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(msg+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= DebugLevel {
 		defaultLogger.provider.Debug(fmt.Sprintf(msg, v...))
 	}
 }
 
 func Debugmf(msg string, format string, v ...interface{}) {
-	if defaultLogger == nil {
-		fmt.Printf(format+"\n", v...)
-		return
-	}
+
 	if defaultLogger.lvl <= DebugLevel {
 		defaultLogger.provider.Debug(msg, zap.String("info", fmt.Sprintf(format, v...)))
 	}
+}
+
+func Println(v ...interface{}) {
+	// Build: "YYYY/MM/DD HH:MM:SS file:line: message"
+	_, file, line, ok := runtime.Caller(1)
+	caller := ""
+	if ok {
+		caller = fmt.Sprintf(" %s:%d: ", filepath.Base(file), line)
+	} else {
+		caller = ": "
+	}
+	ts := time.Now().Format("2006/01/02 15:04:05")
+	msg := fmt.Sprintln(v...)
+	fmt.Printf("%s%s%s", ts, caller, msg)
+}
+
+// Printfln prints formatted plain text with timestamp and caller file:line
+func Printfln(format string, v ...interface{}) {
+	_, file, line, ok := runtime.Caller(1)
+	caller := ""
+	if ok {
+		caller = fmt.Sprintf(" %s:%d: ", filepath.Base(file), line)
+	} else {
+		caller = ": "
+	}
+	ts := time.Now().Format("2006/01/02 15:04:05")
+	msg := fmt.Sprintf(format, v...)
+	fmt.Printf("%s%s%s\n", ts, caller, msg)
+}
+
+func Printf(format string, v ...interface{}) {
+	// Build: "YYYY/MM/DD HH:MM:SS file:line: message"
+	_, file, line, ok := runtime.Caller(1)
+	caller := ""
+	if ok {
+		caller = fmt.Sprintf(" %s:%d: ", filepath.Base(file), line)
+	} else {
+		caller = ": "
+	}
+	ts := time.Now().Format("2006/01/02 15:04:05")
+	msg := fmt.Sprintf(format, v...)
+	fmt.Printf("%s%s%s", ts, caller, msg)
 }

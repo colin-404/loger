@@ -14,6 +14,14 @@ import (
 )
 
 func TestLoger(t *testing.T) {
+	//no json
+	logx.Println("test println")
+	logx.Printfln("test printf: %v", "test")
+	logx.Printf("test printf: %v", "test")
+
+	//json
+	logx.Info("test info json")
+
 	logOpts := &logx.Options{
 		//log path 日志文件路径,默认：./default.log
 		LogFile: "logs/test.log",
@@ -44,6 +52,10 @@ func TestLoger(t *testing.T) {
 
 日志格式
 ```
-{"level":"info","ts":1746334560832477499,"caller":"test/loger_test.go:28","msg":"logx: error"}
-{"level":"info","ts":1746334560832745842,"caller":"test/loger_test.go:31","msg":"logx","info":"test: error"}
+2025/09/27 12:18:58 loger_test.go:12: test println
+2025/09/27 12:18:58 loger_test.go:13: test printf: test
+2025/09/27 12:18:58 loger_test.go:14: test printf: test{"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:15","msg":"test info json"}
+{"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:37","msg":"info"}
+{"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:40","msg":"infof: error"}
+{"level":"info","timestamp":"2025-09-27T12:18:58+08:00","source":"test/loger_test.go:43","msg":"infomf","info":"test: error"}
 ```
